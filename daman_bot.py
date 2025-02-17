@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, CallbackContext
 from sklearn.linear_model import LogisticRegression
 
 # Load environment variables
@@ -34,7 +34,6 @@ y_train = data["result"]
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
-
 # Helper Functions
 def get_user_data(user_id):
     cursor.execute("SELECT balance, bet_history FROM users WHERE user_id=?", (user_id,))
@@ -53,22 +52,22 @@ def update_user_data(user_id, balance, bet_history):
 
 
 # Telegram Bot Commands
-def start(update: Update, context: CallbackContext) -> None:
+async def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
     balance, _ = get_user_data(user_id)
-    update.message.reply_text(
+    await update.message.reply_text(
         f"🎲 Welcome to Daman Predictor Bot! 🎲\n"
         f"💰 Your balance: ₹{balance}\n"
         f"🔮 Use: `/predict Big Small Big Small | Big`"
     )
 
 
-def predict(update: Update, context: CallbackContext) -> None:
+async def predict(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
     balance, bet_history = get_user_data(user_id)
 
     if len(context.args) < 3 or "|" not in context.args:
-        update.message.reply_text("⚠ Format error! Use: `/predict Big Small Big Small | Big`")
+        await update.message.reply_text("⚠ Format error! Use: `/predict Big Small Big Small | Big`")
         return
 
     args = " ".join(context.args).split("|")
@@ -76,7 +75,7 @@ def predict(update: Update, context: CallbackContext) -> None:
     last_result = args[1].strip()
 
     if len(results) < 3:
-        update.message.reply_text("⚠ Enter at least 3 past results.")
+        await update.message.reply_text("⚠ Enter at least 3 past results.")
         return
 
     numeric_results = [1 if x.lower() == "big" else 0 for x in results[-3:]]
@@ -103,24 +102,28 @@ def predict(update: Update, context: CallbackContext) -> None:
         f"📜 Recent Bets:\n{bet_history[-200:]}"
     )
 
-    update.message.reply_text(response)
+    await update.message.reply_text(response)
 
 
-def reset(update: Update, context: CallbackContext) -> None:
+async def reset(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
     update_user_data(user_id, 10000, "")
-    update.message.reply_text("🔄 Balance reset to ₹10,000!")
+    await update.message.reply_text("🔄 Balance reset to ₹10,000!")
 
 
-def main():
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("predict", predict))
-    dp.add_handler(CommandHandler("reset", reset))
-    updater.start_polling()
-    updater.idle()
+async def main() -> None:
+    # Create the Application instance with the bot token
+    application = Application.builder().token(TOKEN).build()
+
+    # Add handlers for commands
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("predict", predict))
+    application.add_handler(CommandHandler("reset", reset))
+
+    # Start polling for updates
+    await application.run_polling()
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    asyncio.run(main())
