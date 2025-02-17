@@ -1,0 +1,6 @@
+python-telegram-bot
+scikit-learn
+numpy
+pandas
+sqlite3
+python-dotenv
