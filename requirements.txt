@@ -1,5 +1,6 @@
-python-telegram-bot
+python-telegram-bot==20.0
 scikit-learn
 numpy
 pandas
 python-dotenv
+sqlite3
