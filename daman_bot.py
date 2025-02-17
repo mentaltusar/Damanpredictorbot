@@ -2,7 +2,6 @@ import os
 import sqlite3
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
 from sklearn.linear_model import LogisticRegression
@@ -10,7 +9,7 @@ import logging
 
 # Load environment variables
 load_dotenv()
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = 7869319157:AAExte8XsBxwInxopd4aFBGae_uYS3A-Ew4
 
 # Initialize database
 conn = sqlite3.connect("daman_bot.db", check_same_thread=False)
