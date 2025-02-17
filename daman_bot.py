@@ -111,6 +111,7 @@ async def reset(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("🔄 Balance reset to ₹10,000!")
 
 
+# Main entry point to the program
 async def main() -> None:
     # Create the Application instance with the bot token
     application = Application.builder().token(TOKEN).build()
@@ -124,6 +125,7 @@ async def main() -> None:
     await application.run_polling()
 
 
+# If running in an environment that already has an event loop (like Railway), we should directly run `main()`
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
+    asyncio.ensure_future(main())
