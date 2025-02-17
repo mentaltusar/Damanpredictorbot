@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
 from sklearn.linear_model import LogisticRegression
+import logging
 
 # Load environment variables
 load_dotenv()
@@ -50,11 +51,13 @@ def update_user_data(user_id, balance, bet_history):
     cursor.execute("UPDATE users SET balance=?, bet_history=? WHERE user_id=?", (balance, bet_history, user_id))
     conn.commit()
 
-
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 # Telegram Bot Commands
 async def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
     balance, _ = get_user_data(user_id)
+    logger.info(f"User {user_id} sent /start command")
     await update.message.reply_text(
         f"🎲 Welcome to Daman Predictor Bot! 🎲\n"
         f"💰 Your balance: ₹{balance}\n"
