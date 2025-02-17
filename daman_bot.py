@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 import logging
 
 # Load environment variables
-load_dotenv()
+
 TOKEN = "7869319157:AAExte8XsBxwInxopd4aFBGae_uYS3A-Ew4"
 
 # Initialize database
